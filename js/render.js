@@ -1,4 +1,11 @@
 let render = (tree, parent) => {   
+    
+    let element = buildElement(tree)
+    parent.innerHTML = ''
+    parent.appendChild(element)
+}
+
+let buildElement = (tree) => {
     let element = document.createElement(tree.elementType)
 
     if(Array.isArray(tree.attributes)){
@@ -12,22 +19,22 @@ let render = (tree, parent) => {
     if(Array.isArray(tree.actions)) {
         
         tree.actions.forEach(action => {
-            console.log('action', element, action, action.bind, action.listeners, action.fn)
             Canyon.actionListener(element, action.listeners, action.fn)
             
         })
     }
 
     if(Array.isArray(tree.children)) {
-        tree.children.forEach((child) => render(child, element))
-    }
-    
-    console.log('element', element)
-    parent.appendChild(element)
+        tree.children.forEach((child) => {
+            element.appendChild(buildElement(child, element))
 
+        })
+    }
+
+    return element
 }
 
-let tree = {
+let myTree = {
     elementType: "div",
     attributes: [],
     actions: [],
@@ -60,15 +67,6 @@ let tree = {
     ]
 }
 
-let list = store.myList.get()
+let renderList = (list, bind) => {
 
-list.forEach(item => tree.children.push({
-    elementType: "div",
-    attributes: [],
-    actions: [],
-    value: item,
-    children: []
-}))
-
-console.log('tree', tree)
-render(tree, document.getElementById("container"))
+}
