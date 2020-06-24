@@ -50,6 +50,40 @@ let Canyon = {
         } else {
             fieldName.watchers.push(fn)
         }
+    },
+    render: (tree, parent) => {   
+    
+        let element = Canyon.buildElement(tree)
+        parent.innerHTML = ''
+        parent.appendChild(element)
+    },
+    buildElement: (tree) => {
+        let element = document.createElement(tree.elementType)
+    
+        if(Array.isArray(tree.attributes)){
+            tree.attributes.forEach(attribute => {
+                element.setAttribute(attribute.name, attribute.value)
+            });
+        }
+        
+        element.textContent = tree.value
+    
+        if(Array.isArray(tree.actions)) {
+            
+            tree.actions.forEach(action => {
+                Canyon.actionListener(element, action.listeners, action.fn)
+                
+            })
+        }
+    
+        if(Array.isArray(tree.children)) {
+            tree.children.forEach((child) => {
+                element.appendChild(Canyon.buildElement(child, element))
+    
+            })
+        }
+    
+        return element
     }
 }
 
@@ -57,83 +91,15 @@ let Canyon = {
 /*
 Register stores
 */
-let store = {
-    counter: Canyon.field("counter", 0),
-    myTextbox: Canyon.field("myTextbox", ""),
-    combined: Canyon.field("combined", "default"),
-    myList: Canyon.field("myList", ["hello", "there", "world"])
-
-}
-
-let lists = {
-    myList: ("myList", () => {
-        console.log(myList.get())
-    })
-}
+let store = {}
 
 /*
 Register watchers
 */
-let watchers = {
-    combinedWatcher: Canyon.watch([store.myTextbox, store.counter], () => {
-        let text = store.myTextbox.get()
-        let count = store.counter.get();
-        store.combined.set(text.concat(count))
-        console.log('object', [...store.myList.get(), store.combined.get()])
-        store.myList.set([...store.myList.get(), store.combined.get()])
-    }),
-    listWatcher: Canyon.watch([store.myList], () => {
-        
-        
-        let list = store.myList.get()
-
-        let myElement = {
-            elementType: "div",
-            attributes: [{"name": "id", "value": "listElement"}],
-            actions: [],
-            value: "",
-            children: []
-        }
-        
-        list.forEach((item, index) => myElement.children.push({
-            elementType: "div",
-            attributes: [{"name":"data-list-id", "value":index}],
-            actions: [],
-            value: item,
-            children: [{
-                elementType: "button",
-                attributes: [{"name":"data-list-id", "value":index}, {"name":"data-action", "value":"removeEntry"}],
-                actions: [actions.removeEntry],
-                value: "Remove"
-            }]
-        }))
-        console.log('myElement, list', myElement, list)
-        render(myElement, document.getElementById("container"))
-    })
-}
+let watchers = {}
 
 /*
 Register actions
 */
-let actions = {
-    count: Canyon.action("count", ["click"], () => {
-        let newValue = store.counter.get() + 1
-        store.counter.set(newValue)
-    }),
-    updateText: Canyon.action("updateText", "input", (e) => {
-        store.myTextbox.set(e.target.value)
-    }),
-    removeEntry: Canyon.action("removeEntry", "click", (e) => {
-
-        let listId = e.target.getAttribute("data-list-id")
-
-
-        let newList = store.myList.get()
-        newList.splice(listId, 1)
-
-        console.log('object', listId, newList, e.target)
-
-        store.myList.set(newList)
-    })
-}
+let actions = {}
 
