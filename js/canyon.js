@@ -8,6 +8,7 @@ let Canyon = {
                 let binds = []
                 binds = document.querySelectorAll(`[data-bind="${bind}"]`)
                 binds.forEach(element => {
+                    element.value = CanyonField.value
                     element.innerText = CanyonField.value
                 })
                 CanyonField.watchers.forEach((watcher) => {
@@ -21,10 +22,6 @@ let Canyon = {
         CanyonField.set(CanyonField.value)
         return CanyonField
     },
-    list: (list, bind, updateFn, renderFn) => {
-        Canyon.watch("myList", updateFn)
-        renderFn.call(list, bind)
-    },
     actionListener: (element, listeners, fn) => {
         if(Array.isArray(listeners)){
             listeners.forEach(listener => {
@@ -35,6 +32,7 @@ let Canyon = {
         }
     },
     action: (bind, listeners, fn) => {
+        console.log('action', bind, listeners, fn)
         let binds = []
         binds = document.querySelectorAll(`[data-action="${bind}"]`)
         binds.forEach(element => {
@@ -51,14 +49,23 @@ let Canyon = {
             fieldName.watchers.push(fn)
         }
     },
-    render: (tree, parent) => {   
+    render: (tree, parent = document.getElementById("root")) => {   
     
         let element = Canyon.buildElement(tree)
         parent.innerHTML = ''
         parent.appendChild(element)
     },
+    renderTemplate: (template, parent = document.getElementById("root")) => {
+        parent.innerHTML = ''
+        parent.appendChild(template)
+    },
     buildElement: (tree) => {
-        let element = document.createElement(tree.elementType)
+        let element = null
+        if(tree.elementType){
+            element = document.createElement(tree.elementType)
+        } else {
+            element = document.createElement("div")
+        }
     
         if(Array.isArray(tree.attributes)){
             tree.attributes.forEach(attribute => {
@@ -87,7 +94,6 @@ let Canyon = {
     }
 }
 
-
 /*
 Register stores
 */
@@ -103,3 +109,51 @@ Register actions
 */
 let actions = {}
 
+// class ElementBuilder {
+//     constructor(attributes, actions, children) {
+//         this.element = {
+//             "elementType": "div"
+//         }
+
+//         this.attributes = {}
+//         this.children = {}
+//         this.actions = {}
+
+//         attributes.forEach(attribute => {
+//             this.addAttribute(attribute.name, attribute.value)
+//         })
+
+//         actions.forEach(attribute => {
+//             this.addAttribute(attribute.name, attribute.value)
+//         })
+
+//         children.forEach(attribute => {
+//             this.addAttribute(attribute.name, attribute.value)
+//         })
+//     }
+//         value.replace(/&/g, "&amp;")
+//         value.replace(/"/g, "&quot;")
+//         value.replace(/</g, "&lt;")
+//         value.replace(/>/g, "&gt;")
+//         return value
+//     }
+
+//     addAttribute(name, value) {
+//         if(name === "value") {
+//             value = this.cleanHTML(attribute.value) 
+//         }
+//         this.element[this.name] = this.value
+//     }
+
+//     addChild(element) {
+//         this.children.push(element)
+//     }
+
+//     addAction() {
+
+//     }
+
+//     getElement() {
+//         return this.element
+//     }
+// }
