@@ -1,17 +1,8 @@
 
 
-store.todos = Canyon.field("myTodos", ["a", "b"])
+store.todos = Canyon.field("myTodos", ["Dishes", "Laundry", "Figure out a new PoE build"])
 store.newTodo = Canyon.field("newTodo", "")
 store.completedTodos = Canyon.field("completedTodos", [])
-
-let setTodos = async () => {
-    let response = await fetch("https://jsonplaceholder.typicode.com/users/1/todos")
-    let todos = await response.json()
-
-    store.todos.set(todos)
-}
-
-setTodos()
 
 actions.updateNewTodo = Canyon.action("updateNewTodo", "input", (e) => {
     store.newTodo.set(e.target.value)
@@ -19,8 +10,10 @@ actions.updateNewTodo = Canyon.action("updateNewTodo", "input", (e) => {
 
 actions.addTodo = Canyon.action("addTodo", ["click"], () => {
     let newItem = store.newTodo.get()
-    store.todos.set([...store.todos.get(), newItem].sort())
-    store.newTodo.set("")
+    if(newItem != "") {
+        store.todos.set([...store.todos.get(), newItem].sort())
+        store.newTodo.set("")
+    }
 })
 
 actions.completeTodo = Canyon.action("completeTodo", ["click"], (e) => {
@@ -47,28 +40,22 @@ watchers.todoWatcher = Canyon.watch([store.todos], () => {
     let id = () => "listElement"
     let completeTodo = () => actions.completeTodo.bind
     
-    let myElement = templateEngine(`<div id="{id}"></div>`, id)
+    let myElement = templateEngine(`<ul id="{id}" class="list-group"></ul>`, id)
 
-    // list.map((item, index) => {
-    //     let value = () => item
-    //     let indexf = () => index
+    let listItemStyle = () => `display:flex; flex:1; align-items: center;`
 
-    //     let subElement = templateEngine(`<div data-list-id="{index}">{value}</div>`, value, indexf)
-    //     let buttonElement = templateEngine(`<button data-list-id="{index}" data-action="{completeTodo}">Complete</button>`, indexf, completeTodo)
-    //     subElement.appendChild(buttonElement)
-    //     myElement.appendChild(subElement)
-    // })
-
-    for(let i = 0 ; i < list.length ; i++){
-        let value = () => list[i].title
+    list.forEach((item, i) => {
+        let value = () => item
         let index = () => i
 
-        let subElement = templateEngine(`<div data-list-id="{index}">{value}</div>`, value, index)
-        let buttonElement = templateEngine(`<button data-list-id="{index}" data-action="{completeTodo}">Complete</button>`, index, completeTodo)
-        subElement.appendChild(buttonElement)
-        myElement.appendChild(subElement)
-    }
-
+        let listContainer = templateEngine(`<li style="{listItemStyle}" class="list-group-item" data-list-id="{index}"></li>`, index, listItemStyle)
+        let subElement = templateEngine(`<div style="{listItemStyle}">{value}</div>`, value, listItemStyle)
+        let buttonElement = templateEngine(`<button type="button" class="btn btn-success" data-list-id="{index}" data-action="{completeTodo}">Complete</button>`, index, completeTodo)
+        
+        listContainer.appendChild(subElement)
+        listContainer.appendChild(buttonElement)
+        myElement.appendChild(listContainer)
+    })
     Canyon.renderTemplate(myElement, document.getElementById("currentTodos"))
 })
 
@@ -79,17 +66,21 @@ watchers.completedTodoWatcher = Canyon.watch([store.completedTodos], () => {
     
     let myElement = templateEngine(`<div id="{id}"></div>`, id)
 
-    for(let i = 0 ; i < list.length ; i++){
-        let value = () => list[i].title
+    let listItemStyle = () => `display:flex; flex:1; align-items: center;`
+    let strikethrough = () => `text-decoration: line-through; color: grey;`
+
+    list.forEach((item, i) => {
+        let value = () => item
         let index = () => i
 
-        let style = () => `text-decoration: line-through; color: grey`
-
-        let subElement = templateEngine(`<div data-list-id="{index}" style="{style}">{value}</div>`, value, index, style)
-        let buttonElement = templateEngine(`<button data-list-id="{index}" data-action="{uncompleteTodo}">Uncomplete</button>`, index, uncompleteTodo)
-        subElement.appendChild(buttonElement)
-        myElement.appendChild(subElement)
-    }
+        let listContainer = templateEngine(`<li style="{listItemStyle}" class="list-group-item" data-list-id="{index}"></li>`, index, listItemStyle)
+        let subElement = templateEngine(`<div style="{listItemStyle}{strikethrough}">{value}</div>`, value, listItemStyle, strikethrough)
+        let buttonElement = templateEngine(`<button type="button" class="btn btn-danger" data-list-id="{index}" data-action="{uncompleteTodo}">Uncomplete</button>`, index, uncompleteTodo)
+        
+        listContainer.appendChild(subElement)
+        listContainer.appendChild(buttonElement)
+        myElement.appendChild(listContainer)
+    })
 
     Canyon.renderTemplate(myElement, document.getElementById("completedTodos"))
 })
