@@ -32,12 +32,13 @@ let Canyon = {
         }
     },
     action: (bind, listeners, fn) => {
-        console.log('action', bind, listeners, fn)
         let binds = []
         binds = document.querySelectorAll(`[data-action="${bind}"]`)
         binds.forEach(element => {
             Canyon.actionListener(element, listeners, fn)
         })
+
+        console.log('bind, listeners, fn', bind, listeners, fn)
         return {bind, listeners, fn}
     },
     watch: (fieldName, fn) => {

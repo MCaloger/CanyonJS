@@ -92,56 +92,18 @@ actions.completeTodo = Canyon.action("completeTodo", "click", (e) => {
 watchers.todoWatcher = Canyon.watch([store.todos], () => {
     let list = store.todos.get()
 
-    console.log("list", list)
+    // let children = []
+    // for(let i = 0 ; i < list.length ; i++) {
 
-    //let myElement = templateEngine(`<div id="@id">hello</div>`, [{name: "id", value:"listElement"}])
 
-    // let myElement = {
-    //     elementType: "div",
-    //     attributes: [{"name": "id", "value": "listElement"}],
-    //     actions: [],
-    //     value: "",
-    //     children: []
+    //     children.push(templateEngine(`<div data-list-id="@id">@value <button data-list-id="@id" data-action="completeTodo">Complete</button></div>`, [{name: "id", value: i}, {name: "value", value: list[i]}]))
     // }
 
+    let id = () => "listElement"
+    let message = () => "hello"
+    let myAction = () => actions.addTodo.bind
 
-    let children = []
-    for(let i = 0 ; i < list.length ; i++) {
-        
-        
+    let myElement = templateEngine(`<div id="{id} data-action="{myAction}">{message}</div>`, [id, message, myAction])
 
-        
-        // myElement.children.push({
-        //     elementType: "div",
-        //     attributes: [{"name":"data-list-id", "value":i}],
-        //     actions: [],
-        //     value: list[i],
-        //     children: [{
-        //         elementType: "button",
-        //         attributes: [{"name":"data-list-id", "value":i}],
-        //         // actions: [actions.removeEntry],
-        //         value: "Remove"
-        //     }]
-        // })
-
-        children.push(templateEngine(`<div data-list-id="@id">@value <button data-list-id="@id" data-action="completeTodo">Complete</button></div>`, [{name: "id", value: i}, {name: "value", value: list[i]}]))
-    }
-
-    let myElement = templateEngine(`<div id="@id">@children</div>`, [{name: "id", value:"listElement"}, {name: "children", value: children}])
-    // list.forEach((item, index) => myElement.children.push({
-    //     elementType: "div",
-    //     attributes: [{"name":"data-list-id", "value":index}],
-    //     actions: [],
-    //     value: item,
-    //     children: [{
-    //         elementType: "button",
-    //         attributes: [{"name":"data-list-id", "value":index}, {"name":"data-action", "value":"removeEntry"}],
-    //         actions: [actions.removeEntry],
-    //         value: "Remove"
-    //     }]
-    // }))
-
-    console.log('children', children)
-    console.log('myElement', myElement)
     Canyon.renderTemplate(myElement, document.getElementById("currentTodos"))
 })
