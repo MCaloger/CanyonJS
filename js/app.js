@@ -1,109 +1,95 @@
-// store.counter = Canyon.field("counter", 0)
-// store.myTextbox = Canyon.field("myTextbox", ""),
-// store.combined = Canyon.field("combined", "default"),
-// store.myList = Canyon.field("myList", ["hello", "there", "world"])
 
-// watchers.combinedWatcher = Canyon.watch([store.myTextbox, store.counter], () => {
-//     let text = store.myTextbox.get()
-//     let count = store.counter.get();
-//     store.combined.set(text.concat(count))
-//     store.myList.set([...store.myList.get(), store.combined.get()])
-// })
 
-// watchers.listWatcher = Canyon.watch([store.myList], () => {
-    
-//     let list = store.myList.get()
-
-//     let myElement = {
-//         elementType: "div",
-//         attributes: [{"name": "id", "value": "listElement"}],
-//         actions: [],
-//         value: "",
-//         children: []
-//     }
-    
-//     list.forEach((item, index) => myElement.children.push({
-//         elementType: "div",
-//         attributes: [{"name":"data-list-id", "value":index}],
-//         actions: [],
-//         value: item,
-//         children: [{
-//             elementType: "button",
-//             attributes: [{"name":"data-list-id", "value":index}, {"name":"data-action", "value":"removeEntry"}],
-//             actions: [actions.removeEntry],
-//             value: "Remove"
-//         }]
-//     }))
-//     Canyon.render(myElement, document.getElementById("container"))
-// })
-
-// actions.count = Canyon.action("count", ["click"], () => {
-//     let newValue = store.counter.get() + 1
-//     store.counter.set(newValue)
-// })
-
-// actions.updateText = Canyon.action("updateText", "input", (e) => {
-//     store.myTextbox.set(e.target.value)
-// })
-
-// actions.removeEntry = Canyon.action("removeEntry", "click", (e) => {
-
-//     let listId = e.target.getAttribute("data-list-id")
-
-//     let newList = store.myList.get()
-//     newList.splice(listId, 1)
-
-//     store.myList.set(newList)
-// })
-
-// let newElement = new ElementBuilder({"id": "hello"}, {"value": "hello there"})
-// let builtElement = Canyon.buildElement(newElement.getElement())
-// Canyon.render(builtElement)
-
-store.todos = Canyon.field("myTodos", [])
+store.todos = Canyon.field("myTodos", ["a", "b"])
 store.newTodo = Canyon.field("newTodo", "")
+store.completedTodos = Canyon.field("completedTodos", [])
+
+let setTodos = async () => {
+    let response = await fetch("https://jsonplaceholder.typicode.com/users/1/todos")
+    let todos = await response.json()
+
+    store.todos.set(todos)
+}
+
+setTodos()
 
 actions.updateNewTodo = Canyon.action("updateNewTodo", "input", (e) => {
     store.newTodo.set(e.target.value)
 })
 
 actions.addTodo = Canyon.action("addTodo", ["click"], () => {
-    let oldItems = store.todos.get()
     let newItem = store.newTodo.get()
-
-    store.todos.set([...oldItems, newItem])
+    store.todos.set([...store.todos.get(), newItem].sort())
     store.newTodo.set("")
 })
 
-actions.completeTodo = Canyon.action("completeTodo", "click", (e) => {
+actions.completeTodo = Canyon.action("completeTodo", ["click"], (e) => {
 
     let listId = e.target.getAttribute("data-list-id")
-
-    let newList = todos.get()
-    newList.splice(listId, 1)
-
-    console.log('newList', newList, listId)
-
-    store.myList.set(newList)
+    let newList = store.todos.get()
+    let newItem = newList.splice(listId, 1)
+    store.completedTodos.set([...store.completedTodos.get(), newItem].sort())
+    store.todos.set(newList.sort())
 })
 
+actions.uncompleteTodo = Canyon.action("uncompleteTodo", ["click"], (e) => {
+    let listId = e.target.getAttribute("data-list-id")
+    let newList = store.completedTodos.get()
+    let newItem = newList.splice(listId, 1)
 
+    let compiledArray = 
+    store.todos.set([...store.todos.get(), newItem].sort())
+    store.completedTodos.set(newList.sort())
+})
 
 watchers.todoWatcher = Canyon.watch([store.todos], () => {
     let list = store.todos.get()
-
-    // let children = []
-    // for(let i = 0 ; i < list.length ; i++) {
-
-
-    //     children.push(templateEngine(`<div data-list-id="@id">@value <button data-list-id="@id" data-action="completeTodo">Complete</button></div>`, [{name: "id", value: i}, {name: "value", value: list[i]}]))
-    // }
-
     let id = () => "listElement"
-    let message = () => "hello"
-    let myAction = () => actions.addTodo.bind
+    let completeTodo = () => actions.completeTodo.bind
+    
+    let myElement = templateEngine(`<div id="{id}"></div>`, id)
 
-    let myElement = templateEngine(`<div id="{id} data-action="{myAction}">{message}</div>`, [id, message, myAction])
+    // list.map((item, index) => {
+    //     let value = () => item
+    //     let indexf = () => index
+
+    //     let subElement = templateEngine(`<div data-list-id="{index}">{value}</div>`, value, indexf)
+    //     let buttonElement = templateEngine(`<button data-list-id="{index}" data-action="{completeTodo}">Complete</button>`, indexf, completeTodo)
+    //     subElement.appendChild(buttonElement)
+    //     myElement.appendChild(subElement)
+    // })
+
+    for(let i = 0 ; i < list.length ; i++){
+        let value = () => list[i].title
+        let index = () => i
+
+        let subElement = templateEngine(`<div data-list-id="{index}">{value}</div>`, value, index)
+        let buttonElement = templateEngine(`<button data-list-id="{index}" data-action="{completeTodo}">Complete</button>`, index, completeTodo)
+        subElement.appendChild(buttonElement)
+        myElement.appendChild(subElement)
+    }
 
     Canyon.renderTemplate(myElement, document.getElementById("currentTodos"))
+})
+
+watchers.completedTodoWatcher = Canyon.watch([store.completedTodos], () => {
+    let list = store.completedTodos.get()
+    let id = () => "listElement"
+    let uncompleteTodo = () => actions.uncompleteTodo.bind
+    
+    let myElement = templateEngine(`<div id="{id}"></div>`, id)
+
+    for(let i = 0 ; i < list.length ; i++){
+        let value = () => list[i].title
+        let index = () => i
+
+        let style = () => `text-decoration: line-through; color: grey`
+
+        let subElement = templateEngine(`<div data-list-id="{index}" style="{style}">{value}</div>`, value, index, style)
+        let buttonElement = templateEngine(`<button data-list-id="{index}" data-action="{uncompleteTodo}">Uncomplete</button>`, index, uncompleteTodo)
+        subElement.appendChild(buttonElement)
+        myElement.appendChild(subElement)
+    }
+
+    Canyon.renderTemplate(myElement, document.getElementById("completedTodos"))
 })

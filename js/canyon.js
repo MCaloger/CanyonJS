@@ -37,18 +37,19 @@ let Canyon = {
         binds.forEach(element => {
             Canyon.actionListener(element, listeners, fn)
         })
-
-        console.log('bind, listeners, fn', bind, listeners, fn)
         return {bind, listeners, fn}
     },
     watch: (fieldName, fn) => {
         if(Array.isArray(fieldName)){
             fieldName.forEach(field => {
                 field.watchers.push(fn)
+                fn.call()
             })
         } else {
             fieldName.watchers.push(fn)
+            fn.call()
         }
+
     },
     render: (tree, parent = document.getElementById("root")) => {   
     
