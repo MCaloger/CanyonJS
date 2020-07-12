@@ -1,20 +1,24 @@
 
-store.todos = Canyon.field("myTodos", ["Dishes", "Laundry", "Figure out a new PoE build"])
-actions.completeTodo = Canyon.action("completeTodo", ["click"], (e) => {
+canyon.store.todos = canyon.field("myTodos", ["Dishes", "Laundry"])
+canyon.store.todoCount = canyon.field("todoCount", 0)
+
+canyon.actions.completeTodo = canyon.action("completeTodo", ["click"], (e) => {
 
     let listId = e.target.getAttribute("data-list-id")
-    let newList = store.todos.get()
+    let newList = canyon.store.todos.get()
     let newItem = newList.splice(listId, 1)
-    store.completedTodos.set([...store.completedTodos.get(), newItem].sort())
-    store.todos.set(newList.sort())
+    canyon.store.completedTodos.set([...canyon.store.completedTodos.get(), newItem].sort())
+    canyon.store.todos.set(newList.sort())
 })
 
-watchers.todoWatcher = Canyon.watch([store.todos], () => {
-    let list = store.todos.get()
+canyon.watchers.todoWatcher = canyon.watch([canyon.store.todos], () => {
+    let list = canyon.store.todos.get()
+    canyon.store.todoCount.set(list.length)
+
     let id = () => "listElement"
-    let completeTodo = () => actions.completeTodo.bind
+    let completeTodo = () => canyon.actions.completeTodo.bind
     
-    let myElement = templateEngine(`<ul id="{id}" class="list-group"></ul>`, id)
+    let myElement = canyon.template(`<ul id="{id}" class="list-group"></ul>`, id)
 
     let listItemStyle = () => `display:flex; flex:1; align-items: center;`
 
@@ -22,7 +26,7 @@ watchers.todoWatcher = Canyon.watch([store.todos], () => {
         let value = () => item
         let index = () => i
 
-        myElement.appendChild(templateEngine(`
+        myElement.appendChild(canyon.template(`
         <li style="{listItemStyle}" class="list-group-item" data-list-id="{index}">
             <div style="{listItemStyle}">
                 {value}
@@ -32,5 +36,5 @@ watchers.todoWatcher = Canyon.watch([store.todos], () => {
             </button>
         </li>`, index, listItemStyle, value, completeTodo))
     })
-    Canyon.renderTemplate(myElement, document.getElementById("currentTodos"))
+    canyon.render(myElement, document.getElementById("currentTodos"))
 })

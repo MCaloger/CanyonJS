@@ -1,20 +1,39 @@
 
-store.completedTodos = Canyon.field("completedTodos", [])
-actions.uncompleteTodo = Canyon.action("uncompleteTodo", ["click"], (e) => {
+canyon.store.completedTodos = canyon.field("completedTodos", [])
+canyon.store.completedTodoCount = canyon.field("completedTodoCount", 0)
+
+canyon.actions.uncompleteTodo = canyon.action("uncompleteTodo", ["click"], (e) => {
     let listId = e.target.getAttribute("data-list-id")
-    let newList = store.completedTodos.get()
+    let newList = canyon.store.completedTodos.get()
     let newItem = newList.splice(listId, 1)
 
-    store.todos.set([...store.todos.get(), newItem].sort())
-    store.completedTodos.set(newList.sort())
+    canyon.store.todos.set([...canyon.store.todos.get(), newItem].sort())
+    canyon.store.completedTodos.set(newList.sort())
+
+    canyon.store.completedTodoCount.set(canyon.store.completedTodos.get().length)
 })
 
-watchers.completedTodoWatcher = Canyon.watch([store.completedTodos], () => {
-    let list = store.completedTodos.get()
-    let id = () => "listElement"
-    let uncompleteTodo = () => actions.uncompleteTodo.bind
+canyon.actions.deleteTodo = canyon.action("deleteTodo", "click", e => {
+    let listId = e.target.getAttribute("data-list-id")
+
+    let newList = canyon.store.completedTodos.get()
+    newList.splice(listId, 1)
+    canyon.store.completedTodos.set(newList.sort())
+
+})
+
+canyon.watchers.completedTodoWatcher = canyon.watch([canyon.store.completedTodos], () => {
+    let list = canyon.store.completedTodos.get()
     
-    let myElement = templateEngine(`<div id="{id}"></div>`, id)
+
+
+    let id = () => "listElement"
+    let uncompleteTodo = () => canyon.actions.uncompleteTodo.bind
+    let deleteTodo = () => canyon.actions.deleteTodo.bind
+
+    
+    
+    let myElement = canyon.template(`<div id="{id}"></div>`, id)
 
     let listItemStyle = () => `display:flex; flex:1; align-items: center;`
     let strikethrough = () => `text-decoration: line-through; color: grey;`
@@ -23,16 +42,21 @@ watchers.completedTodoWatcher = Canyon.watch([store.completedTodos], () => {
         let value = () => item
         let index = () => i
 
-        myElement.appendChild(templateEngine(`
+        myElement.appendChild(canyon.template(`
         <li style="{listItemStyle}" class="list-group-item" data-list-id="{index}">
             <div style="{listItemStyle}{strikethrough}">
                 {value}
             </div>
-            <button type="button" class="btn btn-danger" data-list-id="{index}" data-action="{uncompleteTodo}">
-                Uncomplete
-            </button>
-        </li>`, index, listItemStyle, value, uncompleteTodo, strikethrough))
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-secondary btn-warning" data-list-id="{index}" data-action="{uncompleteTodo}">
+                    Uncomplete
+                </button>
+                <button type="button" class="btn btn-secondary btn-danger" data-list-id="{index}" data-action="{deleteTodo}">
+                    Delete
+                </button>
+            </div>
+        </li>`, index, listItemStyle, value, uncompleteTodo, strikethrough, deleteTodo))
     })
 
-    Canyon.renderTemplate(myElement, document.getElementById("completedTodos"))
+    canyon.render(myElement, document.getElementById("completedTodos"))
 })

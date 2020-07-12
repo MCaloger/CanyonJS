@@ -30,6 +30,7 @@ class Canyon {
     }
 
     actionListener(element, listeners, fn){
+        
         if(Array.isArray(listeners)){
             listeners.forEach(listener => {
                 element.addEventListener(listener, fn)
@@ -41,9 +42,9 @@ class Canyon {
 
     action(bind, listeners, fn) {
         let binds = []
-        binds = document.querySelectorAll(`[data-action="${bind}"]`)
+        binds = document.querySelectorAll(`[data-action*="${bind}"]`)
         binds.forEach(element => {
-            Canyon.actionListener(element, listeners, fn)
+            this.actionListener(element, listeners, fn)
         })
         return {bind, listeners, fn}
     }
@@ -79,12 +80,16 @@ class Canyon {
         let checkElementForActions = (element) => {
             if(element.hasAttribute){
                 if(element.hasAttribute("data-action")) {
-                    let action = element.getAttribute("data-action")
-            
-                    if(actions[action]) {
+                    let dataAction = element.getAttribute("data-action")
+
+                    let actions = dataAction.split(" ")
+
+                    actions.forEach(action => {
+                        if(this.actions[action]) {
                         
-                        Canyon.actionListener(element, actions[action].listeners, actions[action].fn)
-                    }
+                            this.actionListener(element, this.actions[action].listeners, this.actions[action].fn)
+                        }
+                    })
                 }
             }
             
