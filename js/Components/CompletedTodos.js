@@ -1,16 +1,16 @@
 
 canyon.store.completedTodos = canyon.field("completedTodos", [])
-canyon.store.completedTodoCount = canyon.field("completedTodoCount", 0)
+
+canyon.store.completedTodoCounter = canyon.field("completedTodoCounter", 0)
 
 canyon.actions.uncompleteTodo = canyon.action("uncompleteTodo", ["click"], (e) => {
     let listId = e.target.getAttribute("data-list-id")
     let newList = canyon.store.completedTodos.get()
     let newItem = newList.splice(listId, 1)
-
     canyon.store.todos.set([...canyon.store.todos.get(), newItem].sort())
     canyon.store.completedTodos.set(newList.sort())
 
-    canyon.store.completedTodoCount.set(canyon.store.completedTodos.get().length)
+    
 })
 
 canyon.actions.deleteTodo = canyon.action("deleteTodo", "click", e => {
@@ -23,16 +23,13 @@ canyon.actions.deleteTodo = canyon.action("deleteTodo", "click", e => {
 })
 
 canyon.watchers.completedTodoWatcher = canyon.watch([canyon.store.completedTodos], () => {
+
     let list = canyon.store.completedTodos.get()
+    canyon.store.completedTodoCounter.set(list.length)
     
-
-
     let id = () => "listElement"
     let uncompleteTodo = () => canyon.actions.uncompleteTodo.bind
     let deleteTodo = () => canyon.actions.deleteTodo.bind
-
-    
-    
     let myElement = canyon.template(`<div id="{id}"></div>`, id)
 
     let listItemStyle = () => `display:flex; flex:1; align-items: center;`

@@ -1,6 +1,6 @@
 
 canyon.store.todos = canyon.field("myTodos", ["Dishes", "Laundry"])
-canyon.store.todoCount = canyon.field("todoCount", 0)
+canyon.store.todoCounter = canyon.field("todoCounter", canyon.store.todos.get().length)
 
 canyon.actions.completeTodo = canyon.action("completeTodo", ["click"], (e) => {
 
@@ -13,7 +13,7 @@ canyon.actions.completeTodo = canyon.action("completeTodo", ["click"], (e) => {
 
 canyon.watchers.todoWatcher = canyon.watch([canyon.store.todos], () => {
     let list = canyon.store.todos.get()
-    canyon.store.todoCount.set(list.length)
+    canyon.store.todoCounter.set(list.length)
 
     let id = () => "listElement"
     let completeTodo = () => canyon.actions.completeTodo.bind

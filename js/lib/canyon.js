@@ -1,10 +1,26 @@
 class Canyon {
     constructor(){
+        // Stores are managed values that can be affected by actions or watchers
         this.store = {}
+
+        // Watchers are functions that run when a vmanaged store value is modified
         this.watchers = {}
+
+        // Actions are function and event handler couples that perform changes on stored variables
         this.actions = {}
     }
 
+    
+    /**
+     * Canyon.field returns an object containing the value, watchers, and a getter and setter for the store. The Set value contains a check to see if any elements on the DOM contain the attribute [data-bind] and updates the innerText if so.
+     *
+     * @param {String} bind
+     * The name of the data-bind value it correlates to, optional
+     * @param {*} defaultValue
+     * The default value of the field
+     * @returns A wrapped object containing the value of the store, any assigned watchers, and a getter and setter function
+     * @memberof Canyon
+     */
     field(bind, defaultValue) {
         let CanyonField = {
             value: defaultValue,
@@ -29,8 +45,19 @@ class Canyon {
         return CanyonField
     }
 
+    
+    /**
+     * Assigns a DOM event listener for a correspondign action
+     *
+     * @param {Node} element
+     * The Node element
+     * @param {*} listeners
+     * Array or single, the data-action attributes this listener is attached to
+     * @param {*} fn
+     * The function that is assigned tot he event listeners
+     * @memberof Canyon
+     */
     actionListener(element, listeners, fn){
-        
         if(Array.isArray(listeners)){
             listeners.forEach(listener => {
                 element.addEventListener(listener, fn)
@@ -40,9 +67,19 @@ class Canyon {
         }
     }
 
+
+    /**
+     *
+     *
+     * @param {*} bind
+     * @param {*} listeners
+     * @param {*} fn
+     * @returns
+     * @memberof Canyon
+     */
     action(bind, listeners, fn) {
         let binds = []
-        binds = document.querySelectorAll(`[data-action*="${bind}"]`)
+        binds = document.querySelectorAll(`[data-action*="${bind}"]`, `[data-action^="${bind}"]`)
         binds.forEach(element => {
             this.actionListener(element, listeners, fn)
         })

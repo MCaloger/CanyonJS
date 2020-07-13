@@ -9,14 +9,6 @@
 </head>
 <body>
     <div id="root" class="container">
-        <!-- <input data-bind="myTextbox" data-action="updateText" type="text">
-        <p data-bind="counter"></p>
-
-        <button data-action="count">Count</button>
-        <p data-bind="counter"></p>
-        <p data-bind="combined"></p>
-
-        <div id="container" data-list="myList"></div> -->
         <h1>New To-do</h1>
         <div class="input-group mb-3">
             <input type="text" class="form-control" placeholder="New To-do" aria-label="New To-do" aria-describedby="button-addon2" data-bind="newTodo" data-action="updateNewTodo onEnterKey">
@@ -25,27 +17,25 @@
             </div>
           </div>
 
-        <h1>Current To-dos</h1> <div data-bind="todoCounter">0</div>
+        <h1><span data-bind="todoCounter">0</span> Current To-dos</h1> 
         <div id="currentTodos"></div>
 
-        <h1>Completed To-dos</h1> <div data-bind="completedTodoCounter">0</div>
+        <h1><span data-bind="completedTodoCounter">0</span> Completed To-dos</h1> 
         <div id="completedTodos"></div>
 
         <div id="toastContainer"></div>
     </div>
-    <!-- <script src="js/template-engine.js"></script> -->
-    <!-- <script src="js/templateEngineV2.js"></script>
-    <script src="js/canyon.js"></script> -->
+    <!-- Canyon -->
     <script src="js/lib/canyon.js"></script>
 
-    <!-- CSS only -->
+    <!-- External -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-
     <!-- JS, Popper.js, and jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 
+    <!-- App -->
     <script src="js/app.js"></script>
     <script src="js/Components/CompletedTodos.js"></script>
     <script src="js/Components/CurrentTodos.js"></script>
