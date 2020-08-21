@@ -2,7 +2,6 @@ const canyon = new Canyon()
 
 canyon.store.color = canyon.field("color", "white")
 
-
 canyon.actions.toggleColor = canyon.action("toggleColor", ["click"], () => {
     const color = canyon.store.color.get()
     if(color === "white") {
@@ -12,20 +11,29 @@ canyon.actions.toggleColor = canyon.action("toggleColor", ["click"], () => {
     }
 })
 
-
 canyon.watchers.colorWatcher = canyon.watch([canyon.store.color], () => {
-    function e4() {
-        var h=['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'];
-        var k=['x','x','x','x','x','x','x','x','-','x','x','x','x','-','4','x','x','x','-','y','x','x','x','-','x','x','x','x','x','x','x','x','x','x','x','x'];
-        var u='',i=0,rb=Math.random()*0xffffffff|0;
-        while(i++<36) {
-            var c=k[i-1],r=rb&0xf,v=c=='x'?r:(r&0x3|0x8);
-            u+=(c=='-'||c=='4')?c:h[v];rb=i%8==0?Math.random()*0xffffffff|0:rb>>4
+
+    let idGenerator = () => {
+        let alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+        let id = '';
+
+        for(let i = 0 ; i < 16 ; i++){
+            id += alphabet[Math.floor(Math.random() * alphabet.length)];
         }
-        return u
+
+        return id
     }
 
-    let id = () => e4()
+    let colorGenerator = () => {
+        let colors = '0123456789abcdf'.split('')
+        let color = ''
+        for(let i = 0 ; i < 6 ; i++){
+            color += colors[Math.floor(Math.random() * colors.length)];
+        }
+        return color
+    }
+
+    let id = () => idGenerator()
     let color = () => canyon.store.color.get()
     let opposite = () => {
         if(color() == "white") {
@@ -35,34 +43,78 @@ canyon.watchers.colorWatcher = canyon.watch([canyon.store.color], () => {
         }
     } 
 
+    let color1 = () => colorGenerator()
+    let color2 = () => colorGenerator()
+
+
+    console.log('id, color, oppposite', id(), color(), opposite())
+
     let toggleColor = () => canyon.actions.toggleColor.bind
 
     let message = () => "toggle"
 
-    console.log('object', id(), opposite(), color(), toggleColor())
-
-    let generatedStyle = canyon.template(`
-    <style>
-        #{id} {
-            color: {color};
-        }
-
-        #{id}:hover {
-            color: {opposite};
-        }
-    </style>
-    `, color, id, opposite)
-
-    canyon.render(generatedStyle, document.getElementById("styleContainer"))
-    
     let button = canyon.template(`
         
-        <button id="{id}" data-action="{toggleColor}">
-            Toggle
-        </button>
-        
-    `, id, message, toggleColor, color)
+        <div id="{id}" class="card-1" data-action="{toggleColor}">
+            <style>
+                html {
+                    height: 100%;
+                }
+                body {
+                    height: 100%;
+                    margin: 0;
+                    background-repeat: no-repeat;
+                    background-attachment: fixed;
+                    background: linear-gradient(45deg, #{color1}, #{color2});
+                    display:flex;
+                    align-items: center;
+                    justify-content: center;
 
+                    font-family: monospace;
+                }
+                #{id} {
+                    color: linear-gradient(45deg, #{color1}, #{color2});
+                    background: white;
+
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+
+                    border-radius: 10px;
+
+                    width: 100px;
+                    height: 100px;
+                    
+                }
+
+                .card-1 {
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+                    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+                  }
+                  
+                  .card-1:hover {
+                    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+                  }
+
+                  .card-1:active {
+                    box-shadow: 0 7px 14px rgba(0,0,0,0.25), 0 2px 2px rgba(0,0,0,0.22);
+                  }
+            </style>    
+            <div style="flex: 1; display: flex; flex-firection: row; align-items: center;">
+                <div style="background:#{color1}; border: 1px solid black; width: 25px; height: 25px; margin-right: 5px;"></div>
+                <div>{color1}</div>
+            </div>
+            <div style="flex: 1; display: flex; flex-firection: row; align-items: center;">
+                <div style="background:#{color2}; border: 1px solid black; width: 25px; height: 25px; margin-right: 5px;"></div>
+                <div>{color2}</div>
+            </div>
+        </div>
+        
+        
+    `, id, message, toggleColor, color1, color2)
+
+    
     canyon.render(button, document.getElementById("container"))
 })
 

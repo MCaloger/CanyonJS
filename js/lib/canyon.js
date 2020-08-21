@@ -108,7 +108,6 @@ class Canyon {
     }
 
     template(template, ...params) {
-        
         let checkTreeForActions = (tree) => {
             if(tree) {
                 checkElementForActions(tree)
@@ -184,5 +183,13 @@ class Canyon {
         }
     
         return exportElement(newTemplate)
+    }
+}
+
+class CanyonComponent {
+    constructor(template, params) {
+        this.template = template
+        this.params = params
+        return Canyon.template(this.template, this.params)
     }
 }
