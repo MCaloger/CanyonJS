@@ -1,1 +1,0 @@
-let canyon = new Canyon()
