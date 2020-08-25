@@ -105,7 +105,7 @@ class Canyon {
     }
   }
 
-  template(template, params, raw) {
+  template(template, params) {
     let checkTreeForActions = (tree) => {
       if (tree) {
         checkElementForActions(tree);
@@ -157,36 +157,40 @@ class Canyon {
 
       let dom = isDOM(content);
       console.log("content", content, dom);
-
       let element = null;
 
       if (!dom) {
         element = parser.parseFromString(content, "text/html").body
           .childNodes[0];
+        console.log(
+          "elementafterparse",
+          element,
+          typeof element,
+          element instanceof Element
+        );
       } else {
         element = content;
       }
 
       checkTreeForActions(element);
-      console.log("element", element);
       return element;
     };
 
     if (isDOM(template)) {
-      newTemplate = template.outerHTML;
+      console.log("isdom", isdom);
+      //   newTemplate = template.outerHTML;
+      return template;
     }
 
-    // if (isCanyonElement(template)) {
-    //   newTemplate = template.outerHTML;
-    //   console.log("newTemplate", newTemplate);
-    // }
+    if (isCanyonElement(template)) {
+      return template;
+    }
 
     let newTemplate = template;
-    console.log("newTemplate1", newTemplate);
 
-    for (let i = 0; i < params.length; i++) {
-      let name = params[i].name;
-      let value = params[i];
+    Object.keys(params).forEach((key) => {
+      let name = key;
+      let value = params[key];
 
       if (name != "children") {
         if (typeof value === "function") {
@@ -198,14 +202,7 @@ class Canyon {
       let replacer = new RegExp(string(), "g");
 
       newTemplate = newTemplate.replace(replacer, value);
-      console.log("newTemplate2", newTemplate);
-    }
-
-    console.log("newTemplate3", newTemplate);
-
-    if (raw === true) {
-      return newTemplate;
-    }
+    });
 
     return exportElement(newTemplate);
   }
@@ -217,8 +214,7 @@ class CanyonComponent {
   }
 
   build(params) {
-    let ele = canyon.template(this.template, params, true);
-    console.log("ele", ele, ele instanceof Element);
+    let ele = canyon.template(this.template, params);
     return ele;
   }
 }

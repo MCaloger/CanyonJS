@@ -28,18 +28,15 @@ canyon.watchers.completedTodoWatcher = canyon.watch(
     let list = canyon.store.completedTodos.get();
     canyon.store.completedTodoCounter.set(list.length);
 
-    let id = () => "listElement";
-    let uncompleteTodo = () => canyon.actions.uncompleteTodo.bind;
-    let deleteTodo = () => canyon.actions.deleteTodo.bind;
-    let myElement = canyon.template(`<div id="{id}"></div>`, id);
+    let id = "listElement";
+    let uncompleteTodo = canyon.actions.uncompleteTodo.bind;
+    let deleteTodo = canyon.actions.deleteTodo.bind;
+    let myElement = canyon.template(`<div id="{id}"></div>`, { id });
 
-    let listItemStyle = () => `display:flex; flex:1; align-items: center;`;
-    let strikethrough = () => `text-decoration: line-through; color: grey;`;
+    let listItemStyle = `display:flex; flex:1; align-items: center;`;
+    let strikethrough = `text-decoration: line-through; color: grey;`;
 
     list.forEach((item, i) => {
-      let value = () => item;
-      let index = () => i;
-
       myElement.appendChild(
         canyon.template(
           `
@@ -56,14 +53,14 @@ canyon.watchers.completedTodoWatcher = canyon.watch(
                 </button>
             </div>
         </li>`,
-          [
-            index,
+          {
+            index: i,
             listItemStyle,
-            value,
+            value: item,
             uncompleteTodo,
             strikethrough,
             deleteTodo,
-          ]
+          }
         )
       );
     });
