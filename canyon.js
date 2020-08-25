@@ -27,11 +27,16 @@ class Canyon {
       set: (value) => {
         CanyonField.value = value;
         let binds = [];
+        // Find all elements with tag [data-bind] that match the bind name
         binds = document.querySelectorAll(`[data-bind="${bind}"]`);
+
+        // If found, set values or text to bound value
         binds.forEach((element) => {
           element.value = CanyonField.value;
           element.innerText = CanyonField.value;
         });
+
+        // Run watchers if found
         CanyonField.watchers.forEach((watcher) => {
           watcher.call(value);
         });
@@ -86,6 +91,13 @@ class Canyon {
     return { bind, listeners, fn };
   }
 
+  /**
+   *
+   *
+   * @param {*} fieldName
+   * @param {*} fn
+   * @memberof Canyon
+   */
   watch(fieldName, fn) {
     if (Array.isArray(fieldName)) {
       fieldName.forEach((field) => {
@@ -98,14 +110,36 @@ class Canyon {
     }
   }
 
+  /**
+   *
+   *
+   * @param {*} template
+   * @param {string} [parent=document.getElementById("root")]
+   * @memberof Canyon
+   */
   render(template, parent = document.getElementById("root")) {
-    if (template instanceof Node) {
-      parent.innerHTML = "";
-      parent.appendChild(template);
+    try {
+      // Check if template is a DOM node, if so, attach it to the set target
+      if (template instanceof Node) {
+        parent.innerHTML = "";
+        parent.appendChild(template);
+      }
+    } catch(error) {
+      console.warn("Error rendering")
     }
+    
   }
 
+  /**
+   *
+   *
+   * @param {string, Node} template
+   * @param {object} params
+   * @returns Node
+   * @memberof Canyon
+   */
   template(template, params) {
+    // Helper function to check tree for actions
     let checkTreeForActions = (tree) => {
       if (tree) {
         checkElementForActions(tree);
@@ -118,6 +152,7 @@ class Canyon {
       }
     };
 
+    // Helper function called by checktreeForActions() to cherck for actions on specific elements
     let checkElementForActions = (element) => {
       if (element && element.hasAttribute) {
         if (element.hasAttribute("data-action")) {
@@ -138,6 +173,7 @@ class Canyon {
       }
     };
 
+    // Sanitize HTMl to help prevent XSS
     let sanitizer = (content) => {
       let text = content.toString();
       text = text.replace(new RegExp("&", "g"), "&amp;");
@@ -148,26 +184,22 @@ class Canyon {
       return text;
     };
 
+    // Check if DOM
     let isDOM = (el) => el instanceof Element;
 
+    // Check if CanyonComponent
     let isCanyonElement = () => template instanceof CanyonComponent;
 
+    // Turn string to DOM if not already DOM
     let exportElement = (content) => {
       let parser = new DOMParser();
 
       let dom = isDOM(content);
-      console.log("content", content, dom);
       let element = null;
 
       if (!dom) {
         element = parser.parseFromString(content, "text/html").body
           .childNodes[0];
-        console.log(
-          "elementafterparse",
-          element,
-          typeof element,
-          element instanceof Element
-        );
       } else {
         element = content;
       }
@@ -177,8 +209,6 @@ class Canyon {
     };
 
     if (isDOM(template)) {
-      console.log("isdom", isdom);
-      //   newTemplate = template.outerHTML;
       return template;
     }
 
@@ -188,16 +218,18 @@ class Canyon {
 
     let newTemplate = template;
 
+    // Run through parameters and replace with given values
     Object.keys(params).forEach((key) => {
       let name = key;
       let value = params[key];
 
-      if (name != "children") {
-        if (typeof value === "function") {
-          value = sanitizer(value());
-        }
+      if(isDOM(value)) {
+        value = value.outerHTML
+      } else {
+        value = sanitizer(value);
       }
 
+      // Generate replacer string that matches a name, value pair
       let string = () => `{${name}}`;
       let replacer = new RegExp(string(), "g");
 

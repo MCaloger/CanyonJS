@@ -45,20 +45,11 @@ canyon.watchers.todoWatcher = canyon.watch([canyon.store.todos], () => {
 
   list.forEach((item, i) => {
     let Button = buttonComponent.build({ index: i, completeTodo });
-    console.log(
-      "Button, typeof(Button)",
-      Button,
-      typeof Button,
-      Button instanceof Element
-    );
+
     let List = liComponent.build({ i, listItemStyle, value: item, Button });
-    console.log(
-      "List, typeof(List",
-      List,
-      typeof List,
-      List instanceof Element
-    );
+
     myElement.appendChild(List);
   });
+  
   canyon.render(myElement, document.getElementById("currentTodos"));
 });
