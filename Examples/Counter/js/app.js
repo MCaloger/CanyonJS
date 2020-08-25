@@ -1,5 +1,3 @@
-let canyon = new Canyon()
-
 canyon.store.counter = canyon.field('counter', 0)
 
 canyon.actions.add = canyon.action("add", "click", () => {
