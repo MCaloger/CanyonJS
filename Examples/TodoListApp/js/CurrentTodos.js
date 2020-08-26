@@ -36,9 +36,7 @@ canyon.watchers.todoWatcher = canyon.watch([canyon.store.todos], () => {
   let liComponent = new CanyonComponent(
     `
         <li style="{listItemStyle}" class="list-group-item" data-list-id="{index}">
-            <div style="{listItemStyle}">
-                {value}
-            </div>
+            {Title}
             {Button}
         </li>`
   );
@@ -46,7 +44,14 @@ canyon.watchers.todoWatcher = canyon.watch([canyon.store.todos], () => {
   list.forEach((item, i) => {
     let Button = buttonComponent.build({ index: i, completeTodo });
 
-    let List = liComponent.build({ i, listItemStyle, value: item, Button });
+    let Title = new CanyonComponent(`
+    <div style="{listItemStyle}">
+                {item}
+            </div>
+  
+  `).build({listItemStyle, item})
+
+    let List = liComponent.build({ i, listItemStyle, value: item, Button , Title});
 
     myElement.appendChild(List);
   });

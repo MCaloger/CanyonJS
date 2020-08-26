@@ -3,7 +3,7 @@ class Canyon {
     // Stores are managed values that can be affected by actions or watchers
     this.store = {};
 
-    // Watchers are functions that run when a vmanaged store value is modified
+    // Watchers are functions that run when a managed store value is modified
     this.watchers = {};
 
     // Actions are function and event handler couples that perform changes on stored variables
@@ -11,7 +11,8 @@ class Canyon {
   }
 
   /**
-   * Canyon.field returns an object containing the value, watchers, and a getter and setter for the store. The Set value contains a check to see if any elements on the DOM contain the attribute [data-bind] and updates the innerText if so.
+   * Canyon.field returns an object containing the value, watchers, and a getter and setter for the store. 
+   * The Set value contains a check to see if any elements on the DOM contain the attribute [data-bind] and updates the innerText if so.
    *
    * @param {String} bind
    * The name of the data-bind value it correlates to, optional
@@ -125,7 +126,7 @@ class Canyon {
         parent.appendChild(template);
       }
     } catch(error) {
-      console.warn("Error rendering")
+      console.warn("Error rendering", error)
     }
     
   }
@@ -219,7 +220,8 @@ class Canyon {
     let newTemplate = template;
 
     // Run through parameters and replace with given values
-    Object.keys(params).forEach((key) => {
+    if(params) {
+      Object.keys(params).forEach((key) => {
       let name = key;
       let value = params[key];
 
@@ -234,7 +236,9 @@ class Canyon {
       let replacer = new RegExp(string(), "g");
 
       newTemplate = newTemplate.replace(replacer, value);
-    });
+      });
+    }
+    
 
     return exportElement(newTemplate);
   }
