@@ -1,0 +1,1 @@
+let Homepage = () => canyon.template(`<div>This is my home page</div>`)
