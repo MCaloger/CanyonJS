@@ -11,7 +11,7 @@ class Canyon {
   }
 
   /**
-   * Canyon.field returns an object containing the value, watchers, and a getter and setter for the store. 
+   * Canyon.field returns an object containing the value, watchers, and a getter and setter for the store.
    * The Set value contains a check to see if any elements on the DOM contain the attribute [data-bind] and updates the innerText if so.
    *
    * @param {String} bind
@@ -125,10 +125,9 @@ class Canyon {
         parent.innerHTML = "";
         parent.appendChild(template);
       }
-    } catch(error) {
-      console.warn("Error rendering", error)
+    } catch (error) {
+      console.warn("Error rendering", error);
     }
-    
   }
 
   /**
@@ -220,25 +219,24 @@ class Canyon {
     let newTemplate = template;
 
     // Run through parameters and replace with given values
-    if(params) {
+    if (params) {
       Object.keys(params).forEach((key) => {
-      let name = key;
-      let value = params[key];
+        let name = key;
+        let value = params[key];
 
-      if(isDOM(value)) {
-        value = value.outerHTML
-      } else {
-        value = sanitizer(value);
-      }
+        if (isDOM(value)) {
+          value = value.outerHTML;
+        } else {
+          value = sanitizer(value);
+        }
 
-      // Generate replacer string that matches a name, value pair
-      let string = () => `{${name}}`;
-      let replacer = new RegExp(string(), "g");
+        // Generate replacer string that matches a name, value pair
+        let string = () => `{${name}}`;
+        let replacer = new RegExp(string(), "g");
 
-      newTemplate = newTemplate.replace(replacer, value);
+        newTemplate = newTemplate.replace(replacer, value);
       });
     }
-    
 
     return exportElement(newTemplate);
   }
@@ -247,10 +245,18 @@ class Canyon {
 class CanyonComponent {
   constructor(template) {
     this.template = template;
+    this.children = [];
+  }
+
+  add(component) {
+    this.children.push(component);
   }
 
   build(params) {
     let ele = canyon.template(this.template, params);
+    this.children.forEach((child) => {
+      ele.appendChild(child);
+    });
     return ele;
   }
 }

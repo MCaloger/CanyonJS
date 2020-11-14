@@ -1,0 +1,5 @@
+let NewUserPage = new CanyonComponent(
+    `
+    
+    `
+)
