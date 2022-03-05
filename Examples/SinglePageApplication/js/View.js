@@ -5,6 +5,9 @@ let View = (currentLocation) => {
         case "#home":
             page = Homepage()
             break;
+        case "#about":
+            page = About()
+            break;
         default:
             page = canyon.template(`<div>No page found</div>`)
             break;
